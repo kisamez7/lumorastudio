@@ -1,0 +1,12 @@
+# Frontend Next.js no Netlify (plugin oficial @netlify/plugin-nextjs).
+# O processamento (FFmpeg/Whisper/fila) NÃO roda aqui: defina API_BASE_URL apontando para o backend em container.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  # API_BASE_URL = "https://api.seudominio.com"   # configure no painel do Netlify
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

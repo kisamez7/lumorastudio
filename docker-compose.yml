@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: postgres, POSTGRES_PASSWORD: postgres, POSTGRES_DB: app_db }
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U postgres"], interval: 5s, retries: 10 }
+  redis:            # reservado para escala horizontal com workers; a fila atual usa o PostgreSQL
+    image: redis:7
+    volumes: [redisdata:/data]
+  app:
+    build: .
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/app_db
+      REDIS_URL: redis://redis:6379
+      CV_SERVICE_URL: http://cv:8001
+    ports: ["3000:3000"]
+    volumes: [appdata:/data]
+    depends_on: { db: { condition: service_healthy } }
+    restart: unless-stopped
+  cv:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    restart: unless-stopped
+  # ollama:          # opcional: descomente para LLM local (resumos, chat, tradução)
+  #   image: ollama/ollama
+  #   volumes: [ollama:/root/.ollama]
+volumes: { pgdata: {}, redisdata: {}, appdata: {} }

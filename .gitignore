@@ -1,0 +1,8 @@
+node_modules
+.next
+storage/*
+!storage/.gitkeep
+tmp_test
+.env
+*.log
+__pycache__
